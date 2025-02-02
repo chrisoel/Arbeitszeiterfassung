@@ -43,19 +43,25 @@ Die **Zeiterfassung** ist ein Python‑Tool zur Erfassung und Analyse von Arbeit
    cd zeiterfassung
 
 2. **Virtuelle Umgebung einrichten:**
+
 python -m venv venv
 
 3. **Virtuelle Umgebung aktivieren:**
+
 venv\Scripts\activate
 
 4. **Erforderliche Pakete installieren:**
 
+pip install -r requirements.txt
+
 **Verwendung**
+
 Starte die Anwendung mit:
 python time_tracker_app.py
 
 
 **Die grafische Benutzeroberfläche bietet folgende Funktionen:**
+
 Timer: Arbeitszeiten starten, pausieren und erfassen.
 Projekte/Arbeitspakete: Verwalten und Auswählen.
 Diagramme: Anzeigen von Plots zur Analyse der Arbeitszeiten.
@@ -64,6 +70,7 @@ Prognose: Eine Schätzung des durchschnittlichen Zeitaufwands basierend auf hist
 Automatisches Backup: Regelmäßige Sicherung des aktuellen Timer-Zwischenstands.
 
 **Anforderungen**
+
 Alle benötigten Python‑Pakete sind in der Datei requirements.txt aufgeführt.
 
 **Änderungshistorie**
