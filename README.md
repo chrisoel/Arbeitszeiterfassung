@@ -66,10 +66,6 @@ Automatisches Backup: Regelmäßige Sicherung des aktuellen Timer-Zwischenstands
 **Anforderungen**
 Alle benötigten Python‑Pakete sind in der Datei requirements.txt aufgeführt.
 
-**Lizenz**
-
-[Hier Lizenz einfügen, z.B. MIT License]
-
 **Änderungshistorie**
 
 CHOE, 02.02.2025: Initiale Version des Zeiterfassung‑Tools.
