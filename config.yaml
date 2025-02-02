@@ -1,0 +1,10 @@
+backup: {}
+projects:
+- Projekt A
+- Projekt B
+work_packages:
+- Entwicklung
+- Meeting
+- Design
+- Testing
+- Dokumentation
