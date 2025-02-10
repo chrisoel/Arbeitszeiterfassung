@@ -1,18 +1,33 @@
+#!/usr/bin/env python
 """
-@file dialogs.py
-@brief Wiederverwendbare Dialogklassen für die Zeiterfassung.
-@version CHOE 02.02.2025
-@details Diese Datei enthält Dialoge zur Auswahl von Backup-Optionen sowie zum Bestätigen des Programmendes.
+dialogs.py
+----------
+Wiederverwendbare Dialogklassen für die Zeiterfassung.
+
+Dieses Modul enthält Dialoge zur Auswahl von Backup-Optionen sowie zum Bestätigen des Programmendes.
+
+Version: CHOE 10.02.2025
 """
 
 import tkinter as tk
 
+
 class BackupChoiceDialog(tk.Toplevel):
     """
-    @brief Dialog zur Auswahl einer Backup-Option.
-    @details Ermöglicht dem Benutzer, einen ungesicherten Timer fortzusetzen, zu speichern oder zu löschen.
+    Dialog zur Auswahl der Backup-Optionen.
+
+    Dieser Dialog informiert den Benutzer darüber, dass ein ungesicherter Timer gefunden wurde,
+    und bietet die Optionen an, den Timer fortzusetzen, zu speichern oder zu löschen.
     """
-    def __init__(self, parent, message):
+
+    def __init__(self, parent, message: str) -> None:
+        """
+        Initialisiert den BackupChoiceDialog.
+
+        Args:
+            parent: Das übergeordnete Tkinter-Fenster.
+            message (str): Die anzuzeigende Nachricht im Dialog.
+        """
         super().__init__(parent)
         self.title("Ungesicherter Timer gefunden")
         self.result = None
@@ -27,40 +42,53 @@ class BackupChoiceDialog(tk.Toplevel):
         self.grab_set()
         parent.wait_window(self)
 
-    def choose_resume(self):
+    def choose_resume(self) -> None:
         """
-        @brief Setzt die Auswahl auf 'fortsetzen' und schließt den Dialog.
+        Setzt das Ergebnis auf "fortsetzen" und schließt den Dialog.
         """
         self.result = "fortsetzen"
         self.destroy()
 
-    def choose_save(self):
+    def choose_save(self) -> None:
         """
-        @brief Setzt die Auswahl auf 'speichern' und schließt den Dialog.
+        Setzt das Ergebnis auf "speichern" und schließt den Dialog.
         """
         self.result = "speichern"
         self.destroy()
 
-    def choose_delete(self):
+    def choose_delete(self) -> None:
         """
-        @brief Setzt die Auswahl auf 'löschen' und schließt den Dialog.
+        Setzt das Ergebnis auf "löschen" und schließt den Dialog.
         """
         self.result = "löschen"
         self.destroy()
 
-    def on_close(self):
+    def on_close(self) -> None:
         """
-        @brief Wird aufgerufen, wenn der Dialog geschlossen wird.
+        Behandelt das Schließen des Dialogs durch den Benutzer.
+
+        Setzt das Ergebnis auf None und schließt den Dialog.
         """
         self.result = None
         self.destroy()
 
+
 class ClosePromptDialog(tk.Toplevel):
     """
-    @brief Dialog, der beim Schließen der Anwendung erscheint, wenn der Timer läuft.
-    @details Ermöglicht dem Benutzer, den Timer zu speichern, zu verwerfen oder das Schließen abzubrechen.
+    Dialog zur Bestätigung des Programmendes bei laufendem Timer.
+
+    Dieser Dialog weist darauf hin, dass der Timer noch läuft, und bietet die Optionen,
+    den Timer zu speichern, zu verwerfen oder das Schließen abzubrechen.
     """
-    def __init__(self, parent, message):
+
+    def __init__(self, parent, message: str) -> None:
+        """
+        Initialisiert den ClosePromptDialog.
+
+        Args:
+            parent: Das übergeordnete Tkinter-Fenster.
+            message (str): Die anzuzeigende Nachricht im Dialog.
+        """
         super().__init__(parent)
         self.title("Timer läuft noch")
         self.result = None
@@ -75,30 +103,32 @@ class ClosePromptDialog(tk.Toplevel):
         self.grab_set()
         parent.wait_window(self)
 
-    def choose_save(self):
+    def choose_save(self) -> None:
         """
-        @brief Setzt die Auswahl auf 'speichern' und schließt den Dialog.
+        Setzt das Ergebnis auf "speichern" und schließt den Dialog.
         """
         self.result = "speichern"
         self.destroy()
 
-    def choose_discard(self):
+    def choose_discard(self) -> None:
         """
-        @brief Setzt die Auswahl auf 'verwerfen' und schließt den Dialog.
+        Setzt das Ergebnis auf "verwerfen" und schließt den Dialog.
         """
         self.result = "verwerfen"
         self.destroy()
 
-    def choose_cancel(self):
+    def choose_cancel(self) -> None:
         """
-        @brief Setzt die Auswahl auf 'abbrechen' und schließt den Dialog.
+        Setzt das Ergebnis auf "abbrechen" und schließt den Dialog.
         """
         self.result = "abbrechen"
         self.destroy()
 
-    def on_close(self):
+    def on_close(self) -> None:
         """
-        @brief Wird aufgerufen, wenn der Dialog geschlossen wird.
+        Behandelt das Schließen des Dialogs durch den Benutzer.
+
+        Setzt das Ergebnis auf "abbrechen" und schließt den Dialog.
         """
         self.result = "abbrechen"
         self.destroy()

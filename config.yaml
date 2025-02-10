@@ -1,10 +1,8 @@
+REDMINE_BACKUP_PROJECT: ''
+REDMINE_URL: ''
+REDMINE_USER: ''
 backup: {}
 projects:
-- Projekt A
-- Projekt B
-work_packages:
-- Entwicklung
-- Meeting
-- Design
-- Testing
-- Dokumentation
+  - Projekt A
+  - Projekt B
+work_packages: {}

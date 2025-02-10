@@ -1,117 +1,166 @@
+#!/usr/bin/env python
 """
-@file config_manager.py
-@brief Verwaltung der YAML-Konfiguration.
-@version CHOE 02.02.2025
-@details Diese Datei verwaltet das Laden und Speichern der YAML-Konfiguration, in der Projekte, Arbeitspakete und Backup-Daten hinterlegt sind.
+config_manager.py
+-----------------
+Verwaltet Konfigurationsdaten in einer YAML-Datei.
+
+Dieses Modul stellt die Klasse `ConfigurationManager` bereit, die für das Laden, Speichern und
+Aktualisieren von Konfigurationen zuständig ist. Es werden Standardwerte verwendet, falls
+die Konfigurationsdatei nicht existiert oder unvollständige Einstellungen vorliegen.
+
+Version: CHOE 10.02.2025
 """
 
 import os
 import yaml
 import logging
+from typing import Any, Dict, List
 
 logger = logging.getLogger(__name__)
 
-class ConfigManager:
+
+class ConfigurationManager:
     """
-    @brief Klasse zur Verwaltung der Konfiguration.
-    @details Diese Klasse übernimmt das Laden, Speichern und Aktualisieren der Konfigurationsdaten in einer YAML-Datei.
+    Verwaltung der YAML-Konfiguration.
+
+    Diese Klasse kapselt alle Operationen rund um das Laden, Speichern und Aktualisieren
+    der Konfiguration, die in einer YAML-Datei abgelegt wird. Fehlende oder nicht existierende
+    Einstellungen werden durch voreingestellte Standardwerte ersetzt.
     """
-    CONFIG_FILE = "config.yaml"
-    DEFAULT_CONFIG = {
+
+    CONFIG_FILE: str = "config.yaml"
+    DEFAULT_CONFIG: Dict[str, Any] = {
         "projects": ["Projekt A", "Projekt B"],
-        "work_packages": ["Entwicklung", "Meeting", "Design", "Testing", "Dokumentation"],
-        "backup": {}
+        "work_packages": {},
+        "backup": {},
+        "REDMINE_URL": "",
+        "REDMINE_BACKUP_PROJECT": "",
+        "REDMINE_USER": "",
+        "REDMINE_CREDENTIALS": None,
+        "REDMINE_CONFIG_UPDATED": False,
     }
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
-        @brief Initialisiert den ConfigManager und lädt die Konfiguration.
-        """
-        self.config = self.load_config()
+        Initialisiert den ConfigurationManager.
 
-    def load_config(self):
+        Beim Erstellen eines Objekts dieser Klasse wird die Konfiguration automatisch aus der
+        YAML-Datei geladen. Sollte die Datei nicht vorhanden oder unvollständig sein, werden
+        die Standardwerte verwendet und die Datei wird erzeugt.
         """
-        @brief Lädt die Konfiguration aus der YAML-Datei.
-        @return Konfigurations-Dictionary.
+        self.config: Dict[str, Any] = self.load_config()
+
+    def load_config(self) -> Dict[str, Any]:
+        """
+        Lädt die Konfiguration aus der YAML-Datei.
+
+        Wenn die Datei existiert, wird sie geöffnet und der Inhalt wird mittels YAML-Parser
+        eingelesen. Fehlende Schlüssel werden automatisch mit den Standardwerten ergänzt.
+        Tritt ein Fehler beim Laden auf, wird die Standardkonfiguration zurückgegeben.
+
+        Returns:
+            Dict[str, Any]: Ein Dictionary mit allen Konfigurationseinstellungen.
         """
         if os.path.exists(self.CONFIG_FILE):
             try:
                 with open(self.CONFIG_FILE, "r", encoding="utf-8") as f:
-                    config = yaml.safe_load(f)
-                    if config is None:
-                        config = self.DEFAULT_CONFIG.copy()
-                    for key in self.DEFAULT_CONFIG:
-                        if key not in config:
-                            config[key] = self.DEFAULT_CONFIG[key]
-                    return config
-            except Exception as e:
-                logger.error("Fehler beim Laden der Konfiguration: %s", e)
+                    loaded_config = yaml.safe_load(f) or {}
+                for key, value in self.DEFAULT_CONFIG.items():
+                    if key not in loaded_config:
+                        loaded_config[key] = value
+                return loaded_config
+            except Exception as error:
+                logger.error("Fehler beim Laden der Konfiguration: %s", error)
                 return self.DEFAULT_CONFIG.copy()
         else:
             self.save_config(self.DEFAULT_CONFIG.copy())
             return self.DEFAULT_CONFIG.copy()
 
-    def save_config(self, config):
+    def save_config(self, config: Dict[str, Any]) -> None:
         """
-        @brief Speichert das Konfigurations-Dictionary in die YAML-Datei.
-        @param config Das zu speichernde Konfigurations-Dictionary.
+        Speichert die übergebene Konfiguration in der YAML-Datei.
+
+        Nach erfolgreichem Speichern wird die interne Konfiguration aktualisiert.
+
+        Args:
+            config (Dict[str, Any]): Das Konfigurations-Dictionary, das gespeichert werden soll.
         """
         try:
             with open(self.CONFIG_FILE, "w", encoding="utf-8") as f:
                 yaml.safe_dump(config, f, allow_unicode=True)
             self.config = config
-            logger.debug("Konfiguration gespeichert: %s", config)
-        except Exception as e:
-            logger.error("Fehler beim Speichern der Konfiguration: %s", e)
+            logger.debug("Konfiguration erfolgreich gespeichert.")
+        except Exception as error:
+            logger.error("Fehler beim Speichern der Konfiguration: %s", error)
 
-    def get_projects(self):
+    def get_projects(self) -> List[str]:
         """
-        @brief Gibt die Liste der Projekte zurück.
-        @return Liste der Projekte.
+        Gibt die Liste der Projekte aus der Konfiguration zurück.
+
+        Returns:
+            List[str]: Eine Liste von Projektnamen.
         """
         return self.config.get("projects", [])
 
-    def get_work_packages(self):
+    def update_projects(self, projects: List[str]) -> None:
         """
-        @brief Gibt die Liste der Arbeitspakete zurück.
-        @return Liste der Arbeitspakete.
-        """
-        return self.config.get("work_packages", [])
+        Aktualisiert die Liste der Projekte und speichert die Änderung.
 
-    def update_projects(self, projects):
-        """
-        @brief Aktualisiert die Projektliste.
-        @param projects Neue Liste der Projekte.
+        Args:
+            projects (List[str]): Eine Liste der neuen Projektnamen.
         """
         self.config["projects"] = projects
         self.save_config(self.config)
 
-    def update_work_packages(self, work_packages):
+    def get_work_packages(self) -> Dict[str, Any]:
         """
-        @brief Aktualisiert die Liste der Arbeitspakete.
-        @param work_packages Neue Liste der Arbeitspakete.
+        Ruft die Zuordnung der Arbeitsaufgaben (Work Packages) ab.
+
+        Returns:
+            Dict[str, Any]: Ein Dictionary, das Projektnamen auf ihre zugehörigen
+                            Arbeitsaufgaben abbildet.
+        """
+        return self.config.get("work_packages", {})
+
+    def update_work_packages(self, work_packages: Dict[str, Any]) -> None:
+        """
+        Aktualisiert die Zuordnung der Arbeitsaufgaben in der Konfiguration und speichert die Änderung.
+
+        Args:
+            work_packages (Dict[str, Any]): Ein Dictionary mit den neuen Zuordnungen der Arbeitsaufgaben.
         """
         self.config["work_packages"] = work_packages
         self.save_config(self.config)
 
-    def get_backup(self):
+    def get_backup(self) -> Dict[str, Any]:
         """
-        @brief Gibt die aktuellen Backup-Daten zurück.
-        @return Backup-Daten als Dictionary.
+        Gibt die Backup-Daten aus der Konfiguration zurück.
+
+        Returns:
+            Dict[str, Any]: Ein Dictionary, das die aktuellen Backup-Daten enthält.
         """
         return self.config.get("backup", {})
 
-    def update_backup(self, backup_data):
+    def update_backup(self, backup_data: Dict[str, Any]) -> None:
         """
-        @brief Aktualisiert die Backup-Daten.
-        @param backup_data Das Backup-Dictionary.
+        Aktualisiert die Backup-Daten in der Konfiguration und speichert die Änderung.
+
+        Args:
+            backup_data (Dict[str, Any]): Ein Dictionary mit den neuen Backup-Daten.
         """
         self.config["backup"] = backup_data
         self.save_config(self.config)
 
-    def clear_backup(self):
+    def clear_backup(self) -> None:
         """
-        @brief Löscht die Backup-Daten.
+        Löscht alle Backup-Daten aus der Konfiguration und speichert die Änderung.
         """
         self.config["backup"] = {}
+        self.save_config(self.config)
+
+    def reset_config(self) -> None:
+        """
+        Setzt die gesamte Konfiguration auf die Standardwerte zurück und speichert diese Änderung.
+        """
+        self.config = self.DEFAULT_CONFIG.copy()
         self.save_config(self.config)
